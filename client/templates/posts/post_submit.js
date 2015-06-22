@@ -14,7 +14,7 @@ Template.postSubmit.events({
       if (res.postExists)
         alert('This link has already been posted');
 
-      Router.go('postPage', {_id: result._id});
+      Router.go('postPage', {_id: res._id});
     });
   }
 });
