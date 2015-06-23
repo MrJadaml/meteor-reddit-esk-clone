@@ -1,3 +1,16 @@
+Template.postSubmit.onCreated(function () {
+  Session.set('postSubmitErrors', {});
+});
+
+Template.postSubmit.helpers({
+  errorMessage: function(field) {
+    return Session.get('postSubmitErrors')[field];
+  },
+  errorClass: function (field) {
+    return !!Session.get('postSubmitErrors')[field] ? 'has-error' : '';
+  }
+});
+
 Template.postSubmit.events({
   'submit form': function (event) {
     event.preventDefault();
@@ -7,12 +20,16 @@ Template.postSubmit.events({
       title: $(event.target).find('[name=title]').val()
     };
 
+    var errors = validatePost(post);
+    if (errors.title || errors.url)
+      return Session.set('postSubmitErrors', errors);
+
     Meteor.call('postInsert', post, function (err, res) {
       if (err)
-        return alert(err.reason);
+        return throwError(err.reason);
 
       if (res.postExists)
-        alert('This link has already been posted');
+        throwError('This link has already been posted');
 
       Router.go('postPage', {_id: res._id});
     });
